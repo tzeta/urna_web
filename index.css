@@ -2,6 +2,7 @@
 	margin: 0;
 	padding: 0;
 	text-transform: uppercase;
+	font-family: "Delicious-Roman";
 }
 
 
@@ -121,6 +122,12 @@ button{
 	border: solid black 1px;
 }
 
+#bot input{
+	font-size: 1.12em;
+}
+#bot input:hover{
+	font-size: 1.50em;
+} 
 #amarelo{
 	background-color:yellow;	
 }
