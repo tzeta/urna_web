@@ -4,6 +4,16 @@
 		<meta charset="utf-8"/>
 		<title>URNA ELETRONICA</title>
 		<link rel="stylesheet" type="text/css" href="index.css">
+		<script type="text/javascript">
+			function somenteNumeros(num) {
+		        var er = /[^0-9]/;
+		        er.lastIndex = 0;
+		        var campo = num;
+		        if (er.test(campo.value)) {
+		          campo.value = "";
+		        }
+		    }
+		</script>
     </head>
 	<body>
 		<div id="pagina">
@@ -12,10 +22,10 @@
 		<div id="container_central">
 
 			<form method="get" action= "script_index.php" >
-				<span></span><input type="text" name="primeiro" maxlength="1" autocomplete="off" autofocus>
-				<span></span><input type="text" name="segundo" maxlength="1" autocomplete="off">
-				<span></span><input type="text" name="terceiro" maxlength="1" autocomplete="off">
-				<span></span><input type="text" name="quarto" maxlength="1" autocomplete="off">
+				<span></span><input type="text" name="primeiro" onkeyup="somenteNumeros(this);" maxlength="1" autocomplete="off" autofocus required>
+				<span></span><input type="text" name="segundo" onkeyup="somenteNumeros(this);" maxlength="1" max="9" autocomplete="off" required>
+				<span></span><input type="text" name="terceiro" onkeyup="somenteNumeros(this);" maxlength="1" autocomplete="off" required>
+				<span></span><input type="text" name="quarto" onkeyup="somenteNumeros(this);" maxlength="1" autocomplete="off" required>
 				<div id="bot">
 							
 					<input type="reset" name="CORRIGE" value="CORRIGE"  id="amarelo" class="bot" />
