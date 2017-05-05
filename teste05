@@ -1,0 +1,382 @@
+<?php
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$db_local = "base_urnaweb";
+
+
+
+
+function inicial(){
+	$inicial = '<!DOCTYPE HTML>
+		<html>
+			<head>
+				<meta charset="utf-8"/>
+				<title>URNA ELETRONICA</title>
+				<link rel="stylesheet" type="text/css" href="index.css">
+			</head>
+			<body>
+				<div id="pagina">
+				<div id="container_cabecalho"></div>
+				<div id="container_esquerda"><img src="brasao_tre.jpg"></div>
+				<div id="container_central">
+
+					<form method="get" action= "script_index.php" >
+						<span></span><input type="text" name="primeiro" maxlength="1" autocomplete="off" autofocus>
+						<span></span><input type="text" name="segundo" maxlength="1" autocomplete="off">
+						<span></span><input type="text" name="terceiro" maxlength="1" autocomplete="off">
+						<span></span><input type="text" name="quarto" maxlength="1" autocomplete="off">
+						<div id="bot">
+									
+							<input type="reset" name="CORRIGE" value="CORRIGE"  id="amarelo" class="bot" />
+							<input type="submit" name="BRANCO" value="BRANCO"  id="branco" class="bot" />
+							<input type="submit" name="ENTRA" value="ENTRA" id="verde" class="bot" />
+						</div>
+					</form>
+					
+						
+				</div>
+				<div id="container_direita">
+					<img class="teste" src="tre-sp.png">
+				</div>
+				<div id="container_rodape"></div>
+				</div>
+				
+			</body>
+		</html>';
+	echo $inicial;
+}
+
+function chapa(){
+
+        $a = $_GET["primeiro"];
+        $b = $_GET["segundo"];
+        $c = $_GET["terceiro"];
+        $d = $_GET["quarto"];
+
+ 		$st_dados = $a.$b.$c.$d;
+        $chapa = (int) $st_dados;
+        return $chapa;
+}
+
+/*function consulta(){
+	global $candidatos, $key, $ret;
+	
+	$id = chapa();
+	
+	foreach ($candidatos as $candidato) {
+    	$key = $candidato;
+    	$key2 = $candidato[1];
+    	if ($id == $key2){
+    		return $key; }; }
+	$ret = $candidatos['0000'];
+	
+}
+*/
+
+function conectar(){
+	global $conn;
+	$servername = "localhost"; 
+	$username = "root"; 
+	$password = ""; 
+	$db_local = "base_urnaweb";
+	$conn = mysqli_connect($servername, $username, $password,$db_local);
+	if ($conn->connect_error) {
+		die("Connection failed: " . $conn->connect_error);
+	}
+	return $conn;
+
+}
+
+function consulta(){
+			
+			$ponte_banco = conectar();
+			$sql = "SELECT * FROM candidato";
+			$result = $ponte_banco->query($sql);
+			
+			if ($result->num_rows > 0) {
+				while($row = $result->fetch_assoc()) {
+					if ($row['cod_eleitoral'] == chapa()){
+						//$conn->close();
+						return True; }
+				}
+				//$conn->close();
+				return False;
+			}else {
+				echo "Falha na conexao com o banco de dados.";
+			}
+			$conn->close();
+		}
+		
+function candidato(){
+	$ponte_banco = conectar();
+	$sql = "SELECT * FROM candidato";
+	$result = $ponte_banco->query($sql);
+	$cod = chapa();
+	if ($result->num_rows > 0) {
+		while($key = $result->fetch_assoc()) {
+			if ($key['cod_eleitoral'] == $cod){
+				return $key;
+				}
+		}		
+	}
+		
+	$result = $conn->query($sql);
+	if($result->num_rows > 0){
+		while($key = $result->fetch_assoc()){
+			if ($key['cod_eleitoral'] == 0){
+				return $key;
+				}
+		}
+	}
+		echo "Falha na conexao com o banco de dados."; 
+	 
+}		
+
+function get_action($name){
+
+    $params = func_get_args();
+
+    foreach ($params as $name) {
+        if (isset($_GET[$name])) {
+            return $name;
+        }
+    }
+}
+
+function templ_candidato(){
+		
+		$key = candidato();
+        $resp_pag = '<!DOCTYPE HTML>
+			                <html>
+			                <head>
+			                <title>CANDIDATO</title>
+							<link rel="stylesheet" type="text/css" href="index.css">
+							<meta name="viewport" content="width=device-width, initial-scale=1.0">
+							</head>
+			                <body>
+			                    <div id="pagina">
+			                        <div id="container_cabecalho"></div>
+			                        <div id="container_esquerda"><img src="brasao_tre.jpg"></div>
+			                        <div id="container_central">
+			                            <form method="get" action="script_index.php">
+			                            <img class="candidato_img" src='.$key['img'].' />
+			                                <table>
+			                                    <tr>
+			                                        <td class="titulo" > Nome:</td>
+			                                        <td class="informacao"> '.$key['cod_eleitoral'].' </td>
+			                                    </tr>
+			                                    <tr>
+			                                        <td class="titulo" > Partido:</td>
+			                                        <td class="informacao"> '.$key['nome_part'].' </td>
+			                                    </tr>
+			                                    <tr>
+			                                        <td class="titulo" > Numero Eleitoral:</td>
+			                                        <td class="informacao"> '.$key['nome_cand'].' </td>
+			                                    </tr>
+			                                </table>
+			                                
+			                                <div id="botoes_controle">
+			                                    <input type="submit" name="CANCELAR" value="CANCELAR"  id="vermelho" class="bot" />
+			                                    <input type="submit" name="CONFIRMA" value="CONFIRMA"  id="verde" class="bot" />
+			                                </div>
+			                            </form>
+			                        </div>
+			                        <div id="container_direita">
+			                        <img class="teste" src="tre-sp.png">
+								</div>
+			                        <div id="container_rodape"></div>
+			                    </div> 
+			                </body>
+			                </html>';
+        echo $resp_pag;
+}
+
+function templ_branco(){
+		global $candidatos;
+		$bran = $candidatos['9999'];
+        $resp_pag = '<!DOCTYPE HTML>
+			                <html>
+			                <head>
+			                <title>CANDIDATO</title>
+			                <link rel="stylesheet" type="text/css" href="index.css">
+			                </head>
+			                <body>
+			                    <div id="pagina">
+			                        <div id="container_cabecalho"></div>
+			                        <div id="container_esquerda"><img src="brasao_tre.jpg"></div>
+			                        <div id="container_central">
+			                            
+
+			                            <form method="get" action="script_index.php">
+			                            <img class="candidato_img" src='.$bran[3].' />
+			                                <table>
+			                                    <tr>
+			                                        <td class="titulo" > Nome:</td>
+			                                        <td class="informacao"> '.$bran[0].' </td>
+			                                    </tr>
+			                                    <tr>
+			                                        <td class="titulo" > Partido:</td>
+			                                        <td class="informacao"> '.$bran[2].' </td>
+			                                    </tr>
+			                                    
+			                                </table>
+			                                
+			                                <div id="botoes_controle">
+			                                    <input type="submit" name="CANCELAR" value="CANCELAR"  id="vermelho" class="bot" />
+			                                    <input type="submit" name="CONFIRMA" value="CONFIRMA"  id="verde" class="bot" />
+			                                </div>
+			                            </form>
+			                        </div>
+			                        <div id="container_direita">
+			                        <img class="teste" src="tre-sp.png">
+			                    </div>
+			                        <div id="container_rodape"></div>
+			                    </div>
+			                </body>
+			                </html>';
+        echo $resp_pag;
+}
+
+function templ_nulo(){
+		$ret = candidato();
+		while($ret){
+			if ($ret["cod_eleitoral"] == 0);{
+				$resp_pag = '<!DOCTYPE HTML>
+			                <html>
+			                <head>
+			                <title>CANDIDATO</title>
+			                <link rel="stylesheet" type="text/css" href="index.css">
+			                </head>
+			                <body>
+			                    <div id="pagina">
+			                        <div id="container_cabecalho"></div>
+			                        <div id="container_esquerda"><img src="brasao_tre.jpg"></div>
+			                        <div id="container_central">
+			                            <form method="get" action="script_index.php">
+			                            <img class="candidato_img" src='.$ret['img'].' />
+			                                <table>
+			                                    <tr>
+			                                        <td class="titulo" > Nome:</td>
+			                                        <td class="informacao"> '.$ret['nome_cand'].' </td>
+			                                    </tr>
+			                                    <tr>
+			                                        <td class="titulo" > Partido:</td>
+			                                        <td class="informacao"> '.$ret['nome_part'].' </td>
+			                                    </tr>
+			                                    <tr>
+			                                        <td class="titulo" > Numero Eleitoral:</td>
+			                                        <td class="informacao"> '.$ret['cod_eleitoral'].' </td>
+			                                    </tr>
+			                                </table>
+			                                
+			                                <div id="botoes_controle">
+			                                    <input type="submit" name="CANCELAR" value="CANCELAR"  id="vermelho" class="bot" />
+			                                    <input type="submit" name="CONFIRMA" value="CONFIRMA"  id="verde" class="bot" />
+			                                </div>
+			                            </form>
+			                        </div>
+			                        <div id="container_direita">
+			                        <img class="teste" src="tre-sp.png">
+			                    </div>
+			                        <div id="container_rodape"></div>
+			                    </div>
+			                </body>
+			                </html>';
+				echo $resp_pag;
+
+			}
+		}
+}
+
+function templ_concluido(){
+    $resp_pag_con = '<!DOCTYPE HTML>
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <title>FINALIZADO</title>
+                <link rel="stylesheet" type="text/css" href="index.css">
+				<meta http-equiv="REFRESH" content="5; URL=HTTP://localhost/urna/index.html" />
+            </head>
+            <body>
+                <div id="pagina">
+                <div id="container_cabecalho"></div>
+                <div id="container_esquerda"><img src="brasao_tre.jpg"></div>
+                <div id="container_central">
+
+                    <h1>Parabens, voto registrado com sucesso</h1>
+                    <img class="ver" src="ver.jpg">         
+                        
+                </div>
+                <div id="container_direita">
+                    <img class="teste" src="tre-sp.png">
+                </div>
+                <div id="container_rodape"></div>
+                </div>
+                
+            </body>
+        </html>';
+    echo $resp_pag_con;
+
+}
+
+function templ_cancela(){
+    $resp_pag_canc = '<!DOCTYPE HTML>
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+				<meta http-equiv="REFRESH" content="5; URL=HTTP://localhost/urna/index.html" />
+                <title>FINALIZADO</title>
+                <link rel="stylesheet" type="text/css" href="index.css">
+            </head>
+            <body>
+                <div id="pagina">
+                <div id="container_cabecalho"></div>
+                <div id="container_esquerda"><img src="brasao_tre.jpg"></div>
+                <div id="container_central">
+
+                    <h1>Processo cancelado, tente novamente.</h1>
+                    <img class="ver" src="cancela.png">         
+                        
+                </div>
+                <div id="container_direita">
+                    <img class="teste" src="tre-sp.png">
+                </div>
+                <div id="container_rodape"></div>
+                </div>
+                
+            </body>
+        </html>';
+    echo $resp_pag_canc;
+
+} 
+
+switch (get_action('BRANCO', 'ENTRA', 'CONFIRMA', 'CANCELAR')) {
+    
+    case 'ENTRA':
+        if( consulta()){
+        	templ_candidato();
+			}       
+		else{
+			echo "temple nulo"."<br>";
+			templ_nulo();
+		}
+        break;
+    case 'BRANCO':
+        templ_branco();
+        break;
+    case 'CONFIRMA':
+        templ_concluido();
+        break;
+    case 'CANCELAR':
+        templ_cancela();
+        break;
+    
+    default:
+        //no action sent
+        echo 'default';
+
+	}
+
+?>
